@@ -321,13 +321,17 @@ void AMainChar::Attack()
 
 void AMainChar::DoAttack()
 {
-	bAttacking = true;
-
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	if (AnimInstance && CombatMontage)
+	if (!bAttacking)
 	{
-		AnimInstance->Montage_Play(CombatMontage, 1.5f);
-		AnimInstance->Montage_JumpToSection(FName("Attack_01"), CombatMontage);
+		bAttacking = true;
+
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		if (AnimInstance && CombatMontage)
+		{
+			AnimInstance->Montage_Play(CombatMontage, 1.5f);
+			AnimInstance->Montage_JumpToSection(FName("Attack_01"), CombatMontage);
+
+		}
 	}
 }
 
