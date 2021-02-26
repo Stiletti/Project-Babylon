@@ -32,6 +32,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "SkeletalMesh")
 		class USkeletalMeshComponent* SkeletalMesh;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item | Socket")
+		bool bIsRightHand;
+
 	EWeaponState WeaponState;
 
 	virtual void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;

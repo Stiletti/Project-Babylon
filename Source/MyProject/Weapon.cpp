@@ -16,6 +16,8 @@ AWeapon::AWeapon()
 
 	bWeaponParticles = false;
 
+	bIsRightHand = true;
+
 	WeaponState = EWeaponState::EWS_PickUp;
 }
 
@@ -61,13 +63,28 @@ void AWeapon::Equip(AMainChar* MainChar)
 
 		// find the socket to attach the weapon to it
 		const USkeletalMeshSocket* RightHandSocket = MainChar->GetMesh()->GetSocketByName("RightHandSocket");
-		if (RightHandSocket)
+		const USkeletalMeshSocket* LeftHandSocket = MainChar->GetMesh()->GetSocketByName("LeftHandSocket");
+		if (bIsRightHand)
 		{
-			RightHandSocket->AttachActor(this, MainChar->GetMesh());
-			bSetRotation = false;
+			if (RightHandSocket)
+			{
+				RightHandSocket->AttachActor(this, MainChar->GetMesh());
+				bSetRotation = false;
 
-			MainChar->SetEquippedWeapon(this); // sets particular weapon instance for each weapon
-			MainChar->SetActiveOverlappingItem(nullptr);
+				MainChar->SetEquippedWeapon(this); // sets particular weapon instance for each weapon
+				MainChar->SetActiveOverlappingItem(nullptr);
+			}
+		}
+		if (!bIsRightHand)
+		{
+			if (LeftHandSocket)
+			{
+				LeftHandSocket->AttachActor(this, MainChar->GetMesh());
+				bSetRotation = false;
+
+				MainChar->SetEquippedWeapon(this); // sets particular weapon instance for each weapon
+				MainChar->SetActiveOverlappingItem(nullptr);
+			}
 		}
 		if (EquipSound)
 		{
