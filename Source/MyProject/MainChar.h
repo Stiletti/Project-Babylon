@@ -69,6 +69,12 @@ public:
 
 	bool bPickUpKeyDown;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Anims")
+	bool bAttacking;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anims")
+	class UAnimMontage* CombatMontage;
+
 	// Player Stats
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player Stats")
@@ -135,6 +141,13 @@ public:
 	// Set Pickupfunctions
 	void PickUpKeyDown();
 	void PickUpKeyUp();
+
+	// Attacksetup
+	void Attack();
+	void DoAttack();
+
+	UFUNCTION(BlueprintCallable)
+	void AttackEnd();
 
 	// Cameraattachment
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }

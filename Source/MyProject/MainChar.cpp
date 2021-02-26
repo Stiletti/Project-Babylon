@@ -6,6 +6,8 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Weapon.h"
+#include "Animation/AnimInstance.h"
+#include "Components/SkeletalMeshComponent.h"
 
 // Sets default values
 AMainChar::AMainChar()
@@ -52,6 +54,7 @@ AMainChar::AMainChar()
 
 	bShiftKeyDown = false;
 	bPickUpKeyDown = false;
+	bAttacking = false;
 
 	// Initialize Enums
 	MovementStatus = EMovementStatus::EMS_Normal;
@@ -193,11 +196,13 @@ void AMainChar::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 	PlayerInputComponent->BindAction("PickUp", IE_Pressed, this, &AMainChar::PickUpKeyDown);
 	PlayerInputComponent->BindAction("PickUp", IE_Released, this, &AMainChar::PickUpKeyUp);
+
+	PlayerInputComponent->BindAction("Attack_01", IE_Pressed, this, &AMainChar::Attack);
 }
 
 void AMainChar::MoveForward(float Value)
 {
-	if ((Controller != nullptr) && (Value != 0.0f))
+	if ((Controller != nullptr) && (Value != 0.0f) && (!bAttacking))
 	{
 		// Find out which way is forward
 		const FRotator Rotation = Controller->GetControlRotation();
@@ -210,7 +215,7 @@ void AMainChar::MoveForward(float Value)
 
 void AMainChar::MoveRight(float Value)
 {
-	if ((Controller != nullptr) && (Value != 0.0f))
+	if ((Controller != nullptr) && (Value != 0.0f) && (!bAttacking))
 	{
 		// Find out which way is forward
 		const FRotator Rotation = Controller->GetControlRotation();
@@ -304,4 +309,29 @@ void AMainChar::PickUpKeyDown()
 void AMainChar::PickUpKeyUp()
 {
 	bPickUpKeyDown = false;
+}
+
+void AMainChar::Attack()
+{
+	if (EquippedWeapon)
+	{
+		DoAttack();
+	}
+}
+
+void AMainChar::DoAttack()
+{
+	bAttacking = true;
+
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && CombatMontage)
+	{
+		AnimInstance->Montage_Play(CombatMontage, 1.5f);
+		AnimInstance->Montage_JumpToSection(FName("Attack_01"), CombatMontage);
+	}
+}
+
+void AMainChar::AttackEnd()
+{
+	bAttacking = false;
 }
