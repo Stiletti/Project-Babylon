@@ -143,8 +143,8 @@ public:
 	void PickUpKeyUp();
 
 	// Attacksetup
-	void Attack();
-	void DoAttack();
+	void Attack_Normal();
+	void Attack_Hard();
 
 	UFUNCTION(BlueprintCallable)
 	void AttackEnd();

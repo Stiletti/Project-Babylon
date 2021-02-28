@@ -197,7 +197,8 @@ void AMainChar::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAction("PickUp", IE_Pressed, this, &AMainChar::PickUpKeyDown);
 	PlayerInputComponent->BindAction("PickUp", IE_Released, this, &AMainChar::PickUpKeyUp);
 
-	PlayerInputComponent->BindAction("Attack_01", IE_Pressed, this, &AMainChar::Attack);
+	PlayerInputComponent->BindAction("Attack_Normal", IE_Pressed, this, &AMainChar::Attack_Normal);
+	PlayerInputComponent->BindAction("Attack_Hard", IE_Pressed, this, &AMainChar::Attack_Hard);
 }
 
 void AMainChar::MoveForward(float Value)
@@ -311,26 +312,38 @@ void AMainChar::PickUpKeyUp()
 	bPickUpKeyDown = false;
 }
 
-void AMainChar::Attack()
+void AMainChar::Attack_Normal()
 {
 	if (EquippedWeapon)
 	{
-		DoAttack();
+		if (!bAttacking)
+		{
+			bAttacking = true;
+
+			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+			if (AnimInstance && CombatMontage)
+			{
+				AnimInstance->Montage_Play(CombatMontage, 1.5f);
+				AnimInstance->Montage_JumpToSection(FName("Attack_01"), CombatMontage);
+			}
+		}
 	}
 }
 
-void AMainChar::DoAttack()
+void AMainChar::Attack_Hard()
 {
-	if (!bAttacking)
+	if (EquippedWeapon)
 	{
-		bAttacking = true;
-
-		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-		if (AnimInstance && CombatMontage)
+		if (!bAttacking)
 		{
-			AnimInstance->Montage_Play(CombatMontage, 1.5f);
-			AnimInstance->Montage_JumpToSection(FName("Attack_01"), CombatMontage);
+			bAttacking = true;
 
+			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+			if (AnimInstance && CombatMontage)
+			{
+				AnimInstance->Montage_Play(CombatMontage, 1.5f);
+				AnimInstance->Montage_JumpToSection(FName("Attack_02"), CombatMontage);
+			}
 		}
 	}
 }
