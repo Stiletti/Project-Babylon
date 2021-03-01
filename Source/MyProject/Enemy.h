@@ -27,9 +27,35 @@ public:
 
 	// EnemyMovementStatus Function Setup
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Movement")
-	EEnemyMovementStatus EnemyMovementStatus;
+		EEnemyMovementStatus EnemyMovementStatus;
 
 	FORCEINLINE void SetEnemyMovementStatus(EEnemyMovementStatus Status) { EnemyMovementStatus = Status; }
+
+	// creating collisionzones for agro and combatfunctions
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "AI")
+		class USphereComponent* Agro;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "AI")
+		USphereComponent* Combat;
+
+	// creating AIController
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "AI")
+		class AAIController* AIController;
+
+	// OverlapEvents
+	UFUNCTION()
+		virtual void AgroOnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+		virtual void AgroOnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	UFUNCTION()
+		virtual void CombatOnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+		virtual void CombatOnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	void MoveToTarget(class AMainChar* Target);
 
 protected:
 	// Called when the game starts or when spawned

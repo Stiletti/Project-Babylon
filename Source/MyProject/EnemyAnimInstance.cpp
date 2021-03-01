@@ -26,11 +26,13 @@ void UEnemyAnimInstance::UpdateAnimProps()
 
 		if (Pawn)
 		{
-			FVector Speed = Pawn->GetVelocity();
-			FVector LateralSpeed = FVector(Speed.X, Speed.Y, 0.0f); // LateralSpeed just take care for the Yawvalues
-			MovementSpeed = LateralSpeed.Size();
-
 			Enemy = Cast<AEnemy>(Pawn);
 		}
+	}
+	if (Pawn)
+	{
+		FVector Speed = Pawn->GetVelocity();
+		FVector LateralSpeed = FVector(Speed.X, Speed.Y, 0.0f); // LateralSpeed just take care for the Yawvalues
+		MovementSpeed = LateralSpeed.Size();
 	}
 }
