@@ -1,1 +1,1 @@
-# Basic Gameplaysetup with Weaponattachment and switching Blendspüaces / Animmontages
+# Basic Gameplaysetup with Weaponattachment and switching Blendspaces / Animmontages
