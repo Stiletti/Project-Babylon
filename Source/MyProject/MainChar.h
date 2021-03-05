@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "MainChar.generated.h"
 
+// Movementstatemachine
 UENUM(BlueprintType) // get access to the blueprint system for enums
 enum class EMovementStatus : uint8
 {
@@ -15,6 +16,7 @@ enum class EMovementStatus : uint8
 	EMS_MAX UMETA(Displayname = "DefaultMAX") // often used as last enum
 };
 
+// Staminastatemachine
 UENUM(BlueprintType)
 enum class EStaminaStatus : uint8
 {
@@ -35,24 +37,28 @@ public:
 	// Sets default values for this character's properties
 	AMainChar();
 
+	// Statemachine for Movement
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enums")
 	EMovementStatus MovementStatus;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enums")
 	EStaminaStatus StaminaStatus;
 
+	// Camera
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraBoom;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* FollowCamera;
 
+	// Cameraspeed with Gamepad (dont effect Mouse and Keyboard)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
 	float BaseTurnRate;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
 	float BaseLookUpRate;
 
+	// Needed for Sprintmechanic
 	bool bShiftKeyDown;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
@@ -61,6 +67,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 	float MinSprintStamina;
 
+	// Weapon / Itemsetup
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Items")
 	class AWeapon* EquippedWeapon;
 
@@ -69,6 +76,7 @@ public:
 
 	bool bPickUpKeyDown;
 
+	// Attackmontage
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Anims")
 	bool bAttacking;
 
@@ -153,10 +161,13 @@ public:
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
+	// Staminastatus
 	FORCEINLINE void SetStaminaStatus(EStaminaStatus Status) { StaminaStatus = Status; }
 
+	// Weapon Setter and Getter
 	FORCEINLINE AWeapon* GetEquippedWeapon() { return EquippedWeapon; }
 	void SetEquippedWeapon(AWeapon* WeaponToSet);
 
+	// Itemattachment
 	FORCEINLINE void SetActiveOverlappingItem(AItem* Item) { ActiveOverlappingItem = Item; }
 };

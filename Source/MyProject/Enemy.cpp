@@ -26,6 +26,10 @@ AEnemy::AEnemy()
 	Chasing->InitSphereRadius(1000.0f);
 
 	bOverlappingCombatSphere = false;
+
+	Health = 60.0f;
+	MaxHealth = 100.0f;
+	Damage = 10.0f;
 }
 
 void AEnemy::AgroOnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

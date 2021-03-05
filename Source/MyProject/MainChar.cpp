@@ -28,8 +28,9 @@ AMainChar::AMainChar()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	FollowCamera->bUsePawnControlRotation = false;
 
-	BaseTurnRate = 3.0f;
-	BaseLookUpRate = 3.0f;
+	// Baserates for Camera
+	BaseTurnRate = 65.0f;
+	BaseLookUpRate = 65.0f;
 
 	// Dont Rotate when the PlayerController rotates
 	bUseControllerRotationYaw = false;

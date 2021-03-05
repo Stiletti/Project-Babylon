@@ -8,17 +8,37 @@
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundCue.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "Components/CapsuleComponent.h"
+#include "Enemy.h"
 
 AWeapon::AWeapon()
 {
 	SkeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
 	SkeletalMesh->SetupAttachment(GetRootComponent());
 
+	CombatCollision = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CombatCollision"));
+	CombatCollision->SetupAttachment(GetRootComponent());
+
+	CombatCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	CombatCollision->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic); // WorldDynamics can be moved and create Overlapevents
+	CombatCollision->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore); // First ignore all Channels...
+	CombatCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap); // ... then set the needed Channel
+
 	bWeaponParticles = false;
 
 	bIsRightHand = true;
 
+	Damage = 20.0f;
+
 	WeaponState = EWeaponState::EWS_PickUp;
+}
+
+void AWeapon::BeginPlay()
+{
+	Super::BeginPlay();
+
+	CombatCollision->OnComponentBeginOverlap.AddDynamic(this, &AWeapon::CombatOnOverlapBegin);
+	CombatCollision->OnComponentEndOverlap.AddDynamic(this, &AWeapon::CombatOnOverlapEnd);
 }
 
 void AWeapon::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -95,4 +115,39 @@ void AWeapon::Equip(AMainChar* MainChar)
 			IdleParticleSystem->Deactivate();
 		}
 	}
+}
+
+void AWeapon::CombatOnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (OtherActor) // checks the actor we collided with
+	{
+		AEnemy* Enemy = Cast<AEnemy>(OtherActor); // cast the actor to an enemy type so he will be declared as enemy and get its specific values and functions
+		if (Enemy)
+		{
+			if (Enemy->HitParticles)
+			{
+				const USkeletalMeshSocket* WeaponSocket = SkeletalMesh->GetSocketByName("WeaponSocket"); 
+				if (WeaponSocket)
+				{
+					FVector SocketLocation = WeaponSocket->GetSocketLocation(SkeletalMesh);
+					UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), Enemy->HitParticles, SocketLocation, FRotator(0.0f), false);
+				}
+			}
+		}
+	}
+}
+
+void AWeapon::CombatOnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+
+}
+
+void AWeapon::ActivateCollision()
+{
+	CombatCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+}
+
+void AWeapon::DeactivateCollision()
+{
+	CombatCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }

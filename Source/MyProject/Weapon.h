@@ -32,8 +32,14 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "SkeletalMesh")
 		class USkeletalMeshComponent* SkeletalMesh;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item | Combat")
+		class UCapsuleComponent* CombatCollision;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item | Socket")
 		bool bIsRightHand;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item | Combat")
+		float Damage;
 
 	EWeaponState WeaponState;
 
@@ -45,4 +51,20 @@ public:
 
 	FORCEINLINE EWeaponState GetWeaponState() { return WeaponState; }
 	FORCEINLINE void SetWeaponState(EWeaponState State) { WeaponState = State; }
+
+	UFUNCTION()
+		void CombatOnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+		void CombatOnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	UFUNCTION(BlueprintCallable)
+		void ActivateCollision();
+
+	UFUNCTION(BlueprintCallable)
+		void DeactivateCollision();
+
+protected:
+
+	virtual void BeginPlay() override;
 };
