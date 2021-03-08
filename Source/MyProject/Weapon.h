@@ -26,6 +26,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item | Sounds")
 		class USoundCue* EquipSound;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item | Sounds")
+		USoundCue* SwingSound;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item | Particles")
 		bool bWeaponParticles;
 

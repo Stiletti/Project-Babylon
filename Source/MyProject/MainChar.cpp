@@ -8,6 +8,8 @@
 #include "Weapon.h"
 #include "Animation/AnimInstance.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Sound/SoundCue.h"
 
 // Sets default values
 AMainChar::AMainChar()
@@ -326,7 +328,7 @@ void AMainChar::Attack_Normal()
 			{
 				AnimInstance->Montage_Play(CombatMontage, 1.5f);
 				AnimInstance->Montage_JumpToSection(FName("Attack_01"), CombatMontage);
-			}
+			}  
 		}
 	}
 }
@@ -352,4 +354,12 @@ void AMainChar::Attack_Hard()
 void AMainChar::AttackEnd()
 {
 	bAttacking = false;
+}
+
+void AMainChar::PlaySwingSound()
+{
+	if (EquippedWeapon->SwingSound)
+	{
+		UGameplayStatics::PlaySound2D(this, EquippedWeapon->SwingSound);
+	}
 }

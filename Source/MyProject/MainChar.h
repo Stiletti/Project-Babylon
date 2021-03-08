@@ -155,7 +155,10 @@ public:
 	void Attack_Hard();
 
 	UFUNCTION(BlueprintCallable)
-	void AttackEnd();
+		void AttackEnd();
+
+	UFUNCTION(BlueprintCallable)
+		void PlaySwingSound();
 
 	// Cameraattachment
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }

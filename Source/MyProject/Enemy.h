@@ -29,6 +29,10 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Movement")
 		EEnemyMovementStatus EnemyMovementStatus;
 
+	// Enemy HitSound
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
+		class USoundCue* HitSound;
+
 	FORCEINLINE void SetEnemyMovementStatus(EEnemyMovementStatus Status) { EnemyMovementStatus = Status; }
 
 	// creating collisionzones for agro and combatfunctions
