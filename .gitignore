@@ -73,6 +73,6 @@ Plugins/*/Intermediate/*
 # Cache files for the editor to use
 DerivedDataCache/*
 Content/StarterContent/
-Content/Assets/
 Inventory/Content/StarterContent/
 Content/Hack_And_Slash_FX/
+Content/Assets/Torch/
