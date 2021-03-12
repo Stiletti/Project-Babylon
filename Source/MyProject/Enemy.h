@@ -29,18 +29,28 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Movement")
 		EEnemyMovementStatus EnemyMovementStatus;
 
-	// Enemy HitSound
+	// Enemy HitSound and SwingSound
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
 		class USoundCue* HitSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
+		USoundCue* SwingSound;
+
+	// Enemy of kind Monstertype needs Collisioncapsule for its Arm to get handled as a Weapon
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat")
+		class UBoxComponent* CombatCollision;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+		class UAnimMontage* CombatMontage;
 
 	FORCEINLINE void SetEnemyMovementStatus(EEnemyMovementStatus Status) { EnemyMovementStatus = Status; }
 
 	// creating collisionzones for agro and combatfunctions
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "AI")
-		class USphereComponent* Agro;
+		class USphereComponent* AgroSphere;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "AI")
-		USphereComponent* Combat;
+		USphereComponent* CombatSphere;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "AI")
 		USphereComponent* Chasing;
@@ -69,10 +79,16 @@ public:
 
 	// OverlapEvents
 	UFUNCTION()
-		virtual void AgroOnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+		virtual void AgroSphereOnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	UFUNCTION()
-		virtual void AgroOnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+		virtual void AgroSphereOnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	UFUNCTION()
+		virtual void CombatSphereOnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+		virtual void CombatSphereOnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 	UFUNCTION()
 		virtual void CombatOnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
@@ -85,6 +101,21 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		void MoveToTarget(class AMainChar* Target);
+
+	UFUNCTION(BlueprintCallable)
+		void ActivateCollision();
+
+	UFUNCTION(BlueprintCallable)
+		void DeactivateCollision();
+
+	UFUNCTION(BlueprintCallable)
+		void AttackEnd();
+
+
+	void Attack();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat")
+		bool bAttacking;
 
 protected:
 	// Called when the game starts or when spawned

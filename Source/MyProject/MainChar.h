@@ -39,49 +39,56 @@ public:
 
 	// Statemachine for Movement
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enums")
-	EMovementStatus MovementStatus;
+		EMovementStatus MovementStatus;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enums")
-	EStaminaStatus StaminaStatus;
+		EStaminaStatus StaminaStatus;
 
 	// Camera
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
-	class USpringArmComponent* CameraBoom;
+		class USpringArmComponent* CameraBoom;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
-	class UCameraComponent* FollowCamera;
+		class UCameraComponent* FollowCamera;
 
 	// Cameraspeed with Gamepad (dont effect Mouse and Keyboard)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
-	float BaseTurnRate;
+		float BaseTurnRate;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
-	float BaseLookUpRate;
+		float BaseLookUpRate;
 
 	// Needed for Sprintmechanic
 	bool bShiftKeyDown;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
-	float StaminaDrainRate;
+		float StaminaDrainRate;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
-	float MinSprintStamina;
+		float MinSprintStamina;
 
 	// Weapon / Itemsetup
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Items")
-	class AWeapon* EquippedWeapon;
+		class AWeapon* EquippedWeapon;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Items")
-	class AItem* ActiveOverlappingItem;
+		class AItem* ActiveOverlappingItem;
+
+	// Particles and Sound for Enemy Hit
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+		class UParticleSystem* HitParticles;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+		class USoundCue* HitSound;
 
 	bool bPickUpKeyDown;
 
 	// Attackmontage
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Anims")
-	bool bAttacking;
+		bool bAttacking;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anims")
-	class UAnimMontage* CombatMontage;
+		class UAnimMontage* CombatMontage;
 
 	// Player Stats
 
@@ -104,10 +111,10 @@ public:
 		int32 MaxCoins;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Running")
-	float NormalSpeed;
+		float NormalSpeed;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Running")
-	float SprintSpeed;
+		float SprintSpeed;
 
 protected:
 	// Called when the game starts or when spawned
