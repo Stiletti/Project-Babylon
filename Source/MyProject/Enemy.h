@@ -45,6 +45,14 @@ public:
 
 	FORCEINLINE void SetEnemyMovementStatus(EEnemyMovementStatus Status) { EnemyMovementStatus = Status; }
 
+	FTimerHandle AttackTimer;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+		float AttackMinTime;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+		float AttackMaxTime;
+
 	// creating collisionzones for agro and combatfunctions
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "AI")
 		class USphereComponent* AgroSphere;

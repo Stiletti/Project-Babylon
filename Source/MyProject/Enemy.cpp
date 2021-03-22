@@ -11,6 +11,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundCue.h"
 #include "Animation/AnimInstance.h"
+#include "TimerManager.h"
 
 // Sets default values
 AEnemy::AEnemy()
@@ -43,6 +44,9 @@ AEnemy::AEnemy()
 	Health = 60.0f;
 	MaxHealth = 100.0f;
 	Damage = 10.0f;
+
+	AttackMinTime = 0.5f;
+	AttackMaxTime = 2.5f;
 }
 
 void AEnemy::AgroSphereOnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -66,9 +70,11 @@ void AEnemy::CombatSphereOnOverlapBegin(UPrimitiveComponent* OverlappedComponent
 {
 	if (OtherActor)
 	{
-		AMainChar* MainChar = Cast<AMainChar>(OtherActor);
+		AMainChar* MainChar = Cast<AMainChar>(OtherActor); // set otheractor as mainchar to get all its functionalities
 		if (MainChar)
 		{
+			MainChar->SetCombatTarget(this); 
+
 			CombatTarget = MainChar; // setting the target for the animmationsblueprint
 			bOverlappingCombatSphere = true;
 			Attack();
@@ -83,12 +89,14 @@ void AEnemy::CombatSphereOnOverlapEnd(UPrimitiveComponent* OverlappedComponent, 
 		AMainChar* MainChar = Cast<AMainChar>(OtherActor);
 		if (MainChar)
 		{
+			MainChar->SetCombatTarget(nullptr);
 			bOverlappingCombatSphere = false;
 			if (EnemyMovementStatus != EEnemyMovementStatus::EMS_Attacking)
 			{
 				MoveToTarget(MainChar);
 				CombatTarget = nullptr;
 			} 
+			GetWorldTimerManager().ClearTimer(AttackTimer);
 		}
 	}
 }
@@ -215,7 +223,8 @@ void AEnemy::AttackEnd()
 	bAttacking = false;
 	if (bOverlappingCombatSphere)
 	{
-		Attack();
+		float AttackTime = FMath::FRandRange(AttackMinTime, AttackMaxTime);
+		GetWorld()->GetTimerManager().SetTimer(AttackTimer, this, &AEnemy::Attack, AttackTime);
 	}
 }
 

@@ -74,6 +74,18 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Items")
 		class AItem* ActiveOverlappingItem;
 
+	// Characterinterpolation to the Enemy for easier hitting
+	float InterpSpeed;
+	bool bInterpToEnemy;
+	void SetInterpToEnemy(bool Interp);
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
+		class AEnemy* CombatTarget;
+
+	FORCEINLINE void SetCombatTarget(AEnemy* Target) { CombatTarget = Target; }
+
+	FRotator GetLookAtRotationYaw(FVector Target);
+
 	// Particles and Sound for Enemy Hit
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
 		class UParticleSystem* HitParticles;
