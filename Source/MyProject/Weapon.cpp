@@ -74,6 +74,9 @@ void AWeapon::Equip(AMainChar* MainChar)
 {
 	if (MainChar)
 	{
+		// need to set the instigator for damage dealing system
+		SetInstigator(MainChar->GetController());
+
 		// need to set collisionchannels for pawn and camera to ignore to avoid cameraissues
 		SkeletalMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 		SkeletalMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
@@ -136,6 +139,10 @@ void AWeapon::CombatOnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AAc
 			if (Enemy->HitSound)
 			{
 				UGameplayStatics::PlaySound2D(this, Enemy->HitSound);
+			}
+			if (DamageTypeClass)
+			{
+				UGameplayStatics::ApplyDamage(Enemy, Damage, WeaponInstigator, this, DamageTypeClass);
 			}
 		}
 	}

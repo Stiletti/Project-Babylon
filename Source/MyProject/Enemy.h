@@ -12,6 +12,7 @@ enum class EEnemyMovementStatus : uint8
 	EMS_Idle UMETA(DisplayName = "Idle"),
 	EMS_MoveToTarget UMETA(DisplayName = "MoveToTarget"),
 	EMS_Attacking UMETA(DisplayName = "Attacking"),
+	EMS_Dead UMETA(DisplayName = "Dead"),
 
 	EMS_MAX UMETA(DisplayName = "DefaultMax")
 };
@@ -44,7 +45,9 @@ public:
 		class UAnimMontage* CombatMontage;
 
 	FORCEINLINE void SetEnemyMovementStatus(EEnemyMovementStatus Status) { EnemyMovementStatus = Status; }
+	FORCEINLINE EEnemyMovementStatus GetEnemyMovementStatus() { return EnemyMovementStatus; }
 
+	// Attack Delay
 	FTimerHandle AttackTimer;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
@@ -52,6 +55,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
 		float AttackMaxTime;
+
+	// Damagesetup
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+		TSubclassOf<UDamageType> DamageTypeClass;
+
+	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 	// creating collisionzones for agro and combatfunctions
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "AI")
@@ -84,6 +93,11 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
 		float Damage;
+
+	UFUNCTION(BlueprintCallable)
+		void DeathEnd();
+
+	bool Alive();
 
 	// OverlapEvents
 	UFUNCTION()
@@ -119,8 +133,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void AttackEnd();
 
-
 	void Attack();
+
+	void Die();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat")
 		bool bAttacking;

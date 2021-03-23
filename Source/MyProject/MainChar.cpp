@@ -279,9 +279,21 @@ void AMainChar::DecrementHealth(float Amount)
 	}
 }
 
+float AMainChar::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	DecrementHealth(DamageAmount);
+
+	return DamageAmount;
+}
+
 void AMainChar::Die()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Player died !"));
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && CombatMontage)
+	{
+		AnimInstance->Montage_Play(CombatMontage, 1.0f);
+		AnimInstance->Montage_JumpToSection(FName("Death"));
+	}
 }
 
 void AMainChar::IncrementCoinCount(int32 Amount)

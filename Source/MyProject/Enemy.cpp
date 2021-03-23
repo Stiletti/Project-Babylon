@@ -3,6 +3,7 @@
 
 #include "Enemy.h"
 #include "Components/SphereComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "AIController.h"
 #include "MainChar.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -40,18 +41,45 @@ AEnemy::AEnemy()
 	CombatCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap); // ... then set the needed Channel
 
 	bOverlappingCombatSphere = false;
+	EnemyMovementStatus = EEnemyMovementStatus::EMS_Idle;
 
 	Health = 60.0f;
 	MaxHealth = 100.0f;
-	Damage = 10.0f;
+	Damage = 30.0f;
 
 	AttackMinTime = 0.5f;
 	AttackMaxTime = 2.5f;
 }
 
+float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	if (Health - DamageAmount <= 0.0f)
+	{
+		Health -= DamageAmount;
+		Die();
+	}
+	else
+	{
+		Health -= DamageAmount;
+	}
+
+	return DamageAmount;
+}
+
+void AEnemy::DeathEnd()
+{
+	GetMesh()->bPauseAnims = true;
+	GetMesh()->bNoSkeletonUpdate = true;
+}
+
+bool AEnemy::Alive()
+{
+	return GetEnemyMovementStatus() != EEnemyMovementStatus::EMS_Dead;
+}
+
 void AEnemy::AgroSphereOnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor)
+	if (OtherActor && Alive())
 	{
 		AMainChar* MainChar = Cast<AMainChar>(OtherActor);
 		if (MainChar)
@@ -68,7 +96,7 @@ void AEnemy::AgroSphereOnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AA
 
 void AEnemy::CombatSphereOnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor)
+	if (OtherActor && Alive())
 	{
 		AMainChar* MainChar = Cast<AMainChar>(OtherActor); // set otheractor as mainchar to get all its functionalities
 		if (MainChar)
@@ -89,7 +117,10 @@ void AEnemy::CombatSphereOnOverlapEnd(UPrimitiveComponent* OverlappedComponent, 
 		AMainChar* MainChar = Cast<AMainChar>(OtherActor);
 		if (MainChar)
 		{
-			MainChar->SetCombatTarget(nullptr);
+			if (MainChar->CombatTarget == this)
+			{
+				MainChar->SetCombatTarget(nullptr);
+			}
 			bOverlappingCombatSphere = false;
 			if (EnemyMovementStatus != EEnemyMovementStatus::EMS_Attacking)
 			{
@@ -103,11 +134,12 @@ void AEnemy::CombatSphereOnOverlapEnd(UPrimitiveComponent* OverlappedComponent, 
 
 void AEnemy::CombatOnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor) // checks the actor we collided with
+	if (OtherActor && Alive()) // checks the actor we collided with
 	{
-		AMainChar* MainChar = Cast<AMainChar>(OtherActor); // cast the actor to an enemy type so he will be declared as enemy and get its specific values and functions
+		AMainChar* MainChar = Cast<AMainChar>(OtherActor); // cast the actor to type MainChar so he will be declared and get its specific values and functions
 		if (MainChar)
 		{
+			// Setup Particlesystem
 			if (MainChar->HitParticles)
 			{
 				const USkeletalMeshSocket* TipSocket = GetMesh()->GetSocketByName("TipSocket");
@@ -117,9 +149,15 @@ void AEnemy::CombatOnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AAct
 					UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MainChar->HitParticles, SocketLocation, FRotator(0.0f), false);
 				}
 			}
+			// Setup HitSound
 			if (MainChar->HitSound)
 			{
 				UGameplayStatics::PlaySound2D(this, MainChar->HitSound);
+			}
+			// Setup Damageindication
+			if (DamageTypeClass)
+			{
+				UGameplayStatics::ApplyDamage(MainChar, Damage, AIController, this, DamageTypeClass);
 			}
 		}
 	}
@@ -230,20 +268,43 @@ void AEnemy::AttackEnd()
 
 void AEnemy::Attack()
 {
-	if (AIController)
+	if (Alive())
 	{
-		AIController->StopMovement();
-		SetEnemyMovementStatus(EEnemyMovementStatus::EMS_Attacking);
-	}
-	if (!bAttacking)
-	{
-		bAttacking = true;
-		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-		if (AnimInstance)
+		if (AIController)
 		{
-			AnimInstance->Montage_Play(CombatMontage, 1.5f);
-			AnimInstance->Montage_JumpToSection(FName("Attack"), CombatMontage);
+			AIController->StopMovement();
+			SetEnemyMovementStatus(EEnemyMovementStatus::EMS_Attacking);
+		}
+		if (!bAttacking)
+		{
+			bAttacking = true;
+			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+			if (AnimInstance)
+			{
+				AnimInstance->Montage_Play(CombatMontage, 1.5f);
+				AnimInstance->Montage_JumpToSection(FName("Attack"), CombatMontage);
+			}
 		}
 	}
+}
+
+void AEnemy::Die()
+{
+	// play Deathanimation
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && CombatMontage)
+	{
+		AnimInstance->Montage_Play(CombatMontage, 1.0f);
+		AnimInstance->Montage_JumpToSection(FName("Death"));
+	}
+	
+	// set movementstatus to dead
+	SetEnemyMovementStatus(EEnemyMovementStatus::EMS_Dead);
+
+	// set all collisionchannel to nocollision
+	CombatCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	AgroSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	CombatSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
